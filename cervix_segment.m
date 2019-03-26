@@ -2,16 +2,13 @@
 close all; clear all;
 dirlist = dir('*.tif');%dir('*.tif');
 % cd('S:\Nimmi\Cervix Data\Cervix Imaging - Cervix 1 Local');
-for i=82:length(dirlist)
+for i=1:length(dirlist)
     %read in data
     img = imread(dirlist(i).name);  
-
 %% Have to put in these variables before running
-folder = 'C:\Users\mna14\Desktop\Research\VIA image processing\images\despec\'; %Folder where the image is saved
+folder = '/Users/usamahchaudhary/Documents/TOpS/TOpS Cervix Images/Pocket/'; %Folder where the image is saved
 % image =['L',num2str(i)]; %Image name
 filename=dirlist(i).name;%['C:\Users\mna14\Desktop\acetowhitening margin\Peru Lugol\Lugol\normal_all_brown\',image];
-% filename2=['C:\Users\mna14\Desktop\acetowhitening margin\Peru Lugol\Lugol\L2.tif'];
-NumRegions = 1; 
 
 %%
 I = imread(filename);
@@ -19,42 +16,42 @@ I=I(:,:,1:3);
 %Trace outline of cervix
 figure, imshow(I);
 hold on;
-for nnn = 1:1:NumRegions
-h = imfreehand,'jkj';
-CervixTemp = createMask(h);
-eval(['Cervix' num2str(nnn) '= CervixTemp;']); 
+for nnn = 1:1:NumLesions
+h = imfreehand;
+LesionTemp = createMask(h);
+eval(['Lesion' num2str(nnn) '= LesionTemp;']); 
 
 end
 hold off; 
 
-CervixMask = Cervix1; 
+AllLesionsMask = Lesion1; 
     
 I2 = im2double(I);
 
-%% CervixMask
+%% LesionMask
 
 %If you didn't outline it perfectly, this gets rid of the little extra
 %parts or bumps of the outline
-CCtemp = bwconncomp(CervixMask);
+CCtemp = bwconncomp(AllLesionsMask);
 d1 = regionprops(CCtemp,'Area');
 celld1 = struct2cell(d1);
 matd1 = cell2mat(celld1);
 areaTH = matd1; 
 
 idx = find(areaTH<=100);
-CervixMask1 = CervixMask;
+AllLesionsMask1 = AllLesionsMask;
 for ttt = 1:1:length(idx)
     idx_temp = idx(ttt); 
-    CervixMask1(CCtemp.PixelIdxList{idx_temp}) = 0; 
+    AllLesionsMask1(CCtemp.PixelIdxList{idx_temp}) = 0; 
 end
 
-%This finds the center of the cervix and the boundaries
-CervixMaskLabels = bwlabel(CervixMask1); 
-blobMeasurements1 = regionprops(CervixMaskLabels,'Centroid'); 
+%This finds the center of each lesion and the boundaries
+LesionMaskLabels = bwlabel(AllLesionsMask1); 
+blobMeasurements1 = regionprops(LesionMaskLabels,'Centroid'); 
 
-[B,L] = bwboundaries(CervixMask1);
-% save([folder 'cervix_mask\' image '_cervix'],'CervixMask1');
- save([folder 'cervix_mask\' filename '.mat'],'CervixMask1');
+[B,L] = bwboundaries(AllLesionsMask1);
+% save([folder 'cervix_mask\' image '_cervix'],'AllLesionsMask1');
+ save([folder 'cervix_mask\' filename '.mat'],'AllLesionsMask1');
 % saveas(gcf,[folder 'cervix_outline\' filename])
 %% Plot all lesions
 
@@ -65,7 +62,7 @@ labelShiftX = 35;
 %centroid
 figure; imshow(I2);
 hold on;
-for k = 1:NumRegions
+for k = 1:NumLesions
     boundary1 = B{k};
     plot(boundary1(:,2), boundary1(:,1), 'g', 'LineWidth', 2)
     blobCentroid1 = blobMeasurements1(k).Centroid;
@@ -74,9 +71,8 @@ for k = 1:NumRegions
 end
 hold off; 
 
-% save('CervixMask1',[folder 'cervix_mask\' image '_cervix']);
+% save('AllLesionsMask1',[folder 'cervix_mask\' image '_cervix']);
 saveas(gcf,[folder 'cervix_outline\' filename])
-close all
 end
 % %% Stats for all Lesion
 % 
@@ -84,8 +80,8 @@ end
 % LesionStats = zeros(NumLesion,2); 
 % 
 % %This finds the center of each lesion and the boundaries
-% CervixMaskLabels = bwlabel(AllLesionMask1); 
-% CCTemp = bwconncomp(CervixMaskLabels); 
+% LesionMaskLabels = bwlabel(AllLesionMask1); 
+% CCTemp = bwconncomp(LesionMaskLabels); 
 % 
 % %Calculates the major axis of each lesion
 % MajorAxisTemp = regionprops(CCTemp,'MajorAxisLength'); 

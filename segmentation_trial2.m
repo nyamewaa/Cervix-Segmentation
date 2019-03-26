@@ -3,7 +3,7 @@
 clc,clear, close all
 cd('C:\Users\mna14\Desktop\Progress Reports\acetowhitening margin');
 % load('C:\Users\mna14\Desktop\acetowhitening margin\Peru Lugol\cervix_mask\L27_cervix.mat')
-folder='C:\Users\mna14\Desktop\Progress Reports\acetowhitening margin\Peru Lugol\Lugol\normal_pink_yellow_brown';
+folder='C:\Users\mna14\Desktop\Progress Reports\acetowhitening margin\Peru Lugol\Lugol\abnormal_pink_yellow_brown';
 img='L10.tif';
 fullfilename=fullfile(folder, img);
 image=(imread(fullfilename));
@@ -12,7 +12,7 @@ green = image(:,:,2); % Green channel
 blue = image(:,:,3); % Blue channel
 grey=green;%rgb2gray(image);
 figure;imshow(image)
-%% canny threshold 
+%% sobel threshold 
 [~, threshold] = edge(grey, 'canny');
 fudgeFactor = 3;
 BWs = edge(grey,'canny', threshold * fudgeFactor);
